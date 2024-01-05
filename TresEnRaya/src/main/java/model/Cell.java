@@ -26,9 +26,11 @@ public class Cell extends Button{
         this.columna = columna;        
         setMinSize(100, 100);
         setOnAction(e -> {
-            if (!SecondaryController.tableroCompleto()) {
+            if (SecondaryController.jug1.isTurno()) {
                 manejarClic();
-                SecondaryController.turno = 0;
+                SecondaryController.maquin.setTurno(true);
+                SecondaryController.jug1.setTurno(false);
+                SecondaryController.hayGanador();
                 SecondaryController.computadora();
             }
         });        
@@ -43,16 +45,13 @@ public class Cell extends Button{
     }
     
     public void manejarClic() {    
-        if (this.signo == null) {
-            System.out.println(this.toString());
-            //"file:imagenes\\x.png"
+        if (this.signo == null) {                        
             Image imagen = new Image(SecondaryController.jugada());        
             ImageView imageView = new ImageView(imagen);
             imageView.setFitWidth(90);
             imageView.setFitHeight(90);        
             this.setGraphic(imageView);
-            this.setSigno(SecondaryController.jugada());
-            System.out.println(this.toString());
+            this.setSigno(SecondaryController.jugada());            
         }
     }
     

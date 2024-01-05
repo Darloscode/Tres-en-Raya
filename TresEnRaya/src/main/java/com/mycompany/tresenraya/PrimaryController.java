@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import model.Jugador;
 
 public class PrimaryController {
     @FXML
@@ -27,12 +28,16 @@ public class PrimaryController {
     
     @FXML
     private void jugarSolo() throws IOException {
-        this.elegirOpciones();
+        System.out.println("Jugando solo");
+        SecondaryController.modo = "solo";
+        this.opcionesSolo();
     }
 
     @FXML
     private void juegoCoop() throws IOException {
         System.out.println("Jugando con amigo");
+        SecondaryController.modo = "coop";
+        this.opcionesCoop();
     }
 
     @FXML
@@ -45,7 +50,7 @@ public class PrimaryController {
         System.exit(0);
     }
     
-    public void elegirOpciones() {
+    public void opcionesSolo() {
         boxPrincipal.getChildren().clear();
         HBox jugador = new HBox();
         HBox signo = new HBox();
@@ -79,14 +84,15 @@ public class PrimaryController {
             if (x.isSelected() && circulo.isSelected()) {
                 this.alerta();
             } else {                
-                try {
-                    SecondaryController.contraMaquina = true;
-                    if (check1.isSelected()) {                 
-                        SecondaryController.turno = 1;
-                        this.seleccion(x.isSelected());
+                try {                    
+                    if (check1.isSelected()) {
+                        SecondaryController.jug1 = new Jugador("Jugador", true);
+                        SecondaryController.maquin = new Jugador("Maquina", false);
+                        this.seleccionSignos(x.isSelected());
                     } else {                        
-                        SecondaryController.turno = 0;
-                        this.seleccion(x.isSelected());
+                        SecondaryController.jug1 = new Jugador("Jugador", false);
+                        SecondaryController.maquin = new Jugador("Maquina", true);                        
+                        this.seleccionSignos(x.isSelected());
                     }
                     App.setRoot("secondary");                    
                 } catch (IOException ex) {
@@ -96,14 +102,18 @@ public class PrimaryController {
         });        
     }
 
-    public void seleccion (Boolean isSelected) {
+    public void seleccionSignos (Boolean isSelected) {
         if (isSelected) {
-            SecondaryController.jugador1 = "file:imagenes\\x.png";
-            SecondaryController.maquina = "file:imagenes\\c.png";
+            SecondaryController.jug1.setItem("file:imagenes\\x.png");
+            SecondaryController.maquin.setItem("file:imagenes\\c.png");
         } else {
-            SecondaryController.jugador1 = "file:imagenes\\c.png";
-            SecondaryController.maquina = "file:imagenes\\x.png";
+            SecondaryController.jug1.setItem("file:imagenes\\c.png");
+            SecondaryController.maquin.setItem("file:imagenes\\x.png");
         }        
+    }
+        
+    public void opcionesCoop() {
+        //
     }
     
     private void alerta() {
