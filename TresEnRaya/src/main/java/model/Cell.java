@@ -34,7 +34,13 @@ public class Cell extends Button{
                 SecondaryController.computadora();
             }
         });        
-    }    
+    }
+    
+    public Cell(String signo) {
+        this.signo = signo;
+        this.fila = -1;
+        this.columna = -1;
+    }
 
     public String getSigno() {
         return signo;
@@ -62,7 +68,5 @@ public class Cell extends Button{
                 ", fila=" + fila +
                 ", columna=" + columna +
                 '}';
-    }
-    
-
+    }       
 }

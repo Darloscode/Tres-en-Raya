@@ -2,6 +2,9 @@ package com.mycompany.tresenraya;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -17,6 +20,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import model.Cell;
 import model.Jugador;
+import tree.Tree;
+import tree.TreeNode;
 
 public class SecondaryController implements Initializable{
     @FXML
@@ -31,7 +36,7 @@ public class SecondaryController implements Initializable{
     public static Jugador jug2;
     public static String modo;
     
-    public static Cell[][] celdas = new Cell[3][3];
+    public static Cell[][] celdas = new Cell[3][3];    
         
     public static String jugada() {
         if (jug1.isTurno()) {
@@ -58,8 +63,10 @@ public class SecondaryController implements Initializable{
                 tablero.add(celdas[i][j], j, i);
             }        
         }
-        if (modo.equals("solo")) {
-            SecondaryController.computadora();
+        if (modo.equals("solo")) {              
+            this.prueba();
+            
+            //SecondaryController.computadora();
         } else if (modo.equals("coop")) {
             //Código o metodo para un juego de dos jugadores
         } else if (modo.equals("auto")) {
@@ -68,6 +75,7 @@ public class SecondaryController implements Initializable{
     }    
         
     public static void computadora() {
+        SecondaryController.prueba();
         if (maquin.isTurno()){
             boolean salida = true;
             while (salida) {
@@ -85,6 +93,86 @@ public class SecondaryController implements Initializable{
                     salida = false;
                 }            
             }
+        }
+    }
+    
+    public static void prueba() {        
+        Tree<Cell[][]> arbol = new Tree<>(SecondaryController.copy(celdas));                
+        
+        List<Tree<Cell[][]>> lista1 = new ArrayList<Tree<Cell[][]>>();
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {                
+                if (celdas[i][j].getSigno() == null) {
+                    Cell[][] nuevo = SecondaryController.copy(celdas);
+                    nuevo[i][j].setSigno(maquin.getItem());
+                    
+                    Tree<Cell[][]> subArbol = new Tree<>(SecondaryController.copy(nuevo));
+                                        
+                    List<Tree<Cell[][]>> lista2 = new ArrayList<Tree<Cell[][]>>();
+                                        
+                    
+                    for (int m=0; m<3; m++) {
+                        for (int n=0; n<3; n++) {
+                            if (nuevo[m][n].getSigno() == null) {
+                                Cell[][] segunda = SecondaryController.copy(nuevo);
+                                segunda[m][n].setSigno(jug1.getItem());
+                                Tree<Cell[][]> sigArbol = new Tree<>(SecondaryController.copy(segunda));
+                                lista2.add(sigArbol);
+                            }
+                        }
+                    } 
+                    subArbol.getRootNode().setChildren(lista2);                    
+                    lista1.add(subArbol);                                                            
+                }
+            }
+        }        
+        arbol.getRootNode().setChildren(lista1);                        
+        printNodesAtLevel(arbol.getRootNode(), 2, 1);
+    }        
+    
+    private static void printNodesAtLevel(TreeNode<Cell[][]> node, int targetLevel, int currentLevel) {
+        if (node == null) {
+            return;
+        }
+
+        if (currentLevel == targetLevel) {
+            System.out.println("*******************************");
+            imprimirMatriz(node.getContent());           
+            System.out.println("*******************************");
+        } else {
+            for (Tree<Cell[][]> childTree : node.getChildren()) {
+                printNodesAtLevel(childTree.getRootNode(), targetLevel, currentLevel + 1);
+            }
+        }
+    }    
+    
+    public static Cell[][] copy(Cell[][] matriz) {        
+        Cell[][] copia = new Cell[3][3];        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                Cell a = new Cell (matriz[i][j].getSigno());
+                copia[i][j] = a;
+            }
+        }
+        return copia;
+    }    
+    
+    public static void imprimirMatriz(Cell[][] matriz) {
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                if (matriz[i][j].getSigno() == null) {
+                    System.out.print(matriz[i][j].getSigno() + "\t");
+                } else {
+                    if (matriz[i][j].getSigno().equals("file:imagenes\\x.png")){
+                        System.out.print("XXX" + "\t");
+                    } else {
+                        System.out.print("OOO" + "\t");
+                    }
+                }
+                
+            }
+            System.out.println();
         }
     }
     
