@@ -64,5 +64,12 @@ public class Cell extends Button{
                 '}';
     }
     
+    public int obtenerFila() {
+        return this.fila;
+    }
+    
+    public int obtenerColumna() {
+        return this.columna;
+    }
 
 }

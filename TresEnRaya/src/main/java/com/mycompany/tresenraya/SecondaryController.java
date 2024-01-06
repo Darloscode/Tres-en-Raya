@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Random;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
@@ -61,7 +63,7 @@ public class SecondaryController implements Initializable{
         if (modo.equals("solo")) {
             SecondaryController.computadora();
         } else if (modo.equals("coop")) {
-            //Código o metodo para un juego de dos jugadores
+            SecondaryController.persona();
         } else if (modo.equals("auto")) {
             //Código para que la computadora juegue contra si misma
         }
@@ -87,6 +89,22 @@ public class SecondaryController implements Initializable{
             }
         }
     }
+    
+    public static void persona() {
+        //traer fila y columna
+        
+       
+        /*if (maquin.isTurno()) {
+            if (celdas[fila][columna].getSigno() == null) {
+                celdas[fila][columna].manejarClic();
+                jug1.setTurno(true);
+                jug2.setTurno(false);
+                hayGanador();
+        }
+    }*/
+    }
+    
+    
     
     public static boolean tableroCompleto() {        
         for (int i = 0; i < 3; i++) {
