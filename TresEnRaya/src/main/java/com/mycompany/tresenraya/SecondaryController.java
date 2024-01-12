@@ -39,11 +39,20 @@ public class SecondaryController implements Initializable{
     public static Cell[][] celdas = new Cell[3][3];    
         
     public static String jugada() {
-        if (jug1.isTurno()) {
-            return jug1.getItem();
-        } else {
-            return maquin.getItem();
-        }        
+        if (modo.equals("solo")) {        
+            if (jug1.isTurno()) {
+                return jug1.getItem();
+            } else {
+                return maquin.getItem();
+            }        
+        } else if (modo.equals("coop")) {
+            if (jug1.isTurno()) {
+                return jug1.getItem();
+            } else {
+                return jug2.getItem();
+            }                         
+        }
+        return "";        
     }
     
     @FXML
@@ -63,20 +72,20 @@ public class SecondaryController implements Initializable{
                 tablero.add(celdas[i][j], j, i);
             }        
         }
-        if (modo.equals("solo")) {              
-            this.prueba();
-            
-            //SecondaryController.computadora();
+        if (modo.equals("solo")) {
+            SecondaryController.computadora();
         } else if (modo.equals("coop")) {
-            //Código o metodo para un juego de dos jugadores
+            System.out.println(jug1);
+            System.out.println(jug2);            
         } else if (modo.equals("auto")) {
             //Código para que la computadora juegue contra si misma
         }
     }    
         
     public static void computadora() {
-        SecondaryController.prueba();
+        System.out.println("------------------------------------------------------------------");        
         if (maquin.isTurno()){
+            SecondaryController.minimax();
             boolean salida = true;
             while (salida) {
                 Random r = new Random();
@@ -89,14 +98,14 @@ public class SecondaryController implements Initializable{
                     celdas[fila][columna].manejarClic();
                     jug1.setTurno(true);
                     maquin.setTurno(false);
-                    SecondaryController.hayGanador();
+                    System.out.println(SecondaryController.hayGanador());
                     salida = false;
                 }            
             }
         }
     }
     
-    public static void prueba() {        
+    public static void minimax() {        
         Tree<Cell[][]> arbol = new Tree<>(SecondaryController.copy(celdas));                
         
         List<Tree<Cell[][]>> lista1 = new ArrayList<Tree<Cell[][]>>();
@@ -127,9 +136,89 @@ public class SecondaryController implements Initializable{
                 }
             }
         }        
-        arbol.getRootNode().setChildren(lista1);                        
-        printNodesAtLevel(arbol.getRootNode(), 2, 1);
+        arbol.getRootNode().setChildren(lista1);
+        //printNodesAtLevel(arbol.getRootNode(), 2, 1);
+
+        int mejorValor = Integer.MIN_VALUE;
+        Tree<Cell[][]> mejorJugada = null;
+        
+        List<Tree<Cell[][]>> nodosHijos = arbol.getRootNode().getChildren();
+        
+        for (Tree<Cell[][]> hijo : nodosHijos) {            
+            int valor = utilidadHojas(hijo, false);                                    
+            if (valor > mejorValor) {
+                mejorValor = valor;
+                mejorJugada = hijo;
+                System.out.println("HAY");
+            }
+        }
+        
+        imprimirMatriz(mejorJugada.getRoot());
+        
     }        
+
+    public static int evaluarTablero(Cell[][] tablero) {
+        // Verificar filas
+        for (int i = 0; i < 3; i++) {
+            if (tablero[i][0].getSigno() != null &&
+                tablero[i][0].getSigno().equals(tablero[i][1].getSigno()) &&
+                tablero[i][0].getSigno().equals(tablero[i][2].getSigno())) {
+                return tablero[i][0].getSigno().equals(maquin.getItem()) ? 1 : -1;
+            }
+        }
+
+        // Verificar columnas
+        for (int j = 0; j < 3; j++) {
+            if (tablero[0][j].getSigno() != null &&
+                tablero[0][j].getSigno().equals(tablero[1][j].getSigno()) &&
+                tablero[0][j].getSigno().equals(tablero[2][j].getSigno())) {
+                return tablero[0][j].getSigno().equals(maquin.getItem()) ? 1 : -1;
+            }
+        }
+
+        // Verificar diagonales
+        if (tablero[0][0].getSigno() != null &&
+            tablero[0][0].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[0][0].getSigno().equals(tablero[2][2].getSigno())) {
+            return tablero[0][0].getSigno().equals(maquin.getItem()) ? 1 : -1;
+        }
+
+        if (tablero[0][2].getSigno() != null &&
+            tablero[0][2].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[0][2].getSigno().equals(tablero[2][0].getSigno())) {
+            return tablero[0][2].getSigno().equals(maquin.getItem()) ? 1 : -1;
+        }
+
+        // Si no hay ganador, se considera empate
+        return 0;
+    }    
+    
+    public static int utilidadHojas(Tree<Cell[][]> nodo, boolean esMaximizador) {
+        
+        if (nodo.isLeaf()) {
+            return evaluarTablero(nodo.getRoot());
+        }
+
+        List<Tree<Cell[][]>> hijos = nodo.getRootNode().getChildren();
+        int mejorValor;
+
+        if (esMaximizador) {
+            mejorValor = Integer.MIN_VALUE;
+
+            for (Tree<Cell[][]> hijo : hijos) {
+                int valor = utilidadHojas(hijo, false);
+                mejorValor = Math.max(mejorValor, valor);
+            }
+        } else {
+            mejorValor = Integer.MAX_VALUE;
+
+            for (Tree<Cell[][]> hijo : hijos) {
+                int valor = utilidadHojas(hijo, true);
+                mejorValor = Math.min(mejorValor, valor);
+            }
+        }
+        return mejorValor;
+    }    
     
     private static void printNodesAtLevel(TreeNode<Cell[][]> node, int targetLevel, int currentLevel) {
         if (node == null) {
@@ -159,20 +248,22 @@ public class SecondaryController implements Initializable{
     }    
     
     public static void imprimirMatriz(Cell[][] matriz) {
-        for (int i = 0; i < matriz.length; i++) {
-            for (int j = 0; j < matriz[i].length; j++) {
-                if (matriz[i][j].getSigno() == null) {
-                    System.out.print(matriz[i][j].getSigno() + "\t");
-                } else {
-                    if (matriz[i][j].getSigno().equals("file:imagenes\\x.png")){
-                        System.out.print("XXX" + "\t");
+        if (matriz!=null){
+            for (int i = 0; i < matriz.length; i++) {
+                for (int j = 0; j < matriz[i].length; j++) {
+                    if (matriz[i][j].getSigno() == null) {
+                        System.out.print(matriz[i][j].getSigno() + "\t");
                     } else {
-                        System.out.print("OOO" + "\t");
+                        if (matriz[i][j].getSigno().equals("file:imagenes\\x.png")){
+                            System.out.print("XXX" + "\t");
+                        } else {
+                            System.out.print("OOO" + "\t");
+                        }
                     }
+
                 }
-                
+                System.out.println();
             }
-            System.out.println();
         }
     }
     
@@ -187,7 +278,7 @@ public class SecondaryController implements Initializable{
         return true;
     }         
 
-    public static void hayGanador() {
+    public static boolean hayGanador() {
         String ganador = "";
         
         if (tableroCompleto()){
@@ -199,7 +290,7 @@ public class SecondaryController implements Initializable{
             if (celdas[i][0].getSigno() != null &&
                 celdas[i][0].getSigno().equals(celdas[i][1].getSigno()) &&
                 celdas[i][1].getSigno().equals(celdas[i][2].getSigno())) {
-                ganador = celdas[i][0].getSigno();
+                ganador = celdas[i][0].getSigno();                
             }         
         }
 
@@ -228,36 +319,81 @@ public class SecondaryController implements Initializable{
         if (ganador.equals("Empate")){
             SecondaryController.alerta("Es un empate!!");
             SecondaryController.alerta("Juego terminado");
-            jug1.setTurno(false);
-            maquin.setTurno(false);
+            
+            if (modo.equals("solo")) {
+                jug1.setTurno(false);
+                maquin.setTurno(false);                
+            } else if (modo.equals("coop")) {
+                jug1.setTurno(false);
+                jug2.setTurno(false);
+            } else {
+                
+            }            
             try {
                 App.setRoot("primary");
+                return false;
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
         } else {
-            if (ganador.equals(jug1.getItem())) {
-                SecondaryController.alerta("Ha ganado "+jug1.getNombre());                             
-                SecondaryController.alerta("Juego terminado");   
-                jug1.setTurno(false);
-                maquin.setTurno(false);                
-                try {
-                    App.setRoot("primary");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
+            
+            if (modo.equals("solo")) {
+
+                if (ganador.equals(jug1.getItem())) {
+                    SecondaryController.alerta("Ha ganado "+jug1.getNombre());                             
+                    SecondaryController.alerta("Juego terminado");   
+                    jug1.setTurno(false);
+                    maquin.setTurno(false);                
+                    try {
+                        App.setRoot("primary");
+                        return true;
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                } else if (ganador.equals(maquin.getItem())) {
+                    SecondaryController.alerta("Ha ganado "+maquin.getNombre());
+                    SecondaryController.alerta("Juego terminado");
+                    jug1.setTurno(false);
+                    maquin.setTurno(false);
+                    try {                        
+                        App.setRoot("primary");
+                        return true;
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
                 }
-            } else if (ganador.equals(maquin.getItem())) {
-                SecondaryController.alerta("Ha ganado "+maquin.getNombre());
-                SecondaryController.alerta("Juego terminado");
-                jug1.setTurno(false);
-                maquin.setTurno(false);                
-                try {
-                    App.setRoot("primary");
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            }
+                
+            } else if (modo.equals("coop")) {
+                
+                if (ganador.equals(jug1.getItem())) {
+                    SecondaryController.alerta("Ha ganado "+jug1.getNombre());                             
+                    SecondaryController.alerta("Juego terminado");   
+                    jug1.setTurno(false);
+                    jug2.setTurno(false);                
+                    try {
+                        App.setRoot("primary");
+                        return true;
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                } else if (ganador.equals(jug2.getItem())) {
+                    SecondaryController.alerta("Ha ganado "+jug2.getNombre());
+                    SecondaryController.alerta("Juego terminado");
+                    jug1.setTurno(false);
+                    jug2.setTurno(false);                
+                    try {
+                        App.setRoot("primary");
+                        return true;
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                }                
+                
+            } else {
+                
+            }                       
         }        
+        return false;
     }
         
     public static void alerta(String mensaje) {        

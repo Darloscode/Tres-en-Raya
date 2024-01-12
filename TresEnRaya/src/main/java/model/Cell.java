@@ -26,13 +26,34 @@ public class Cell extends Button{
         this.columna = columna;        
         setMinSize(100, 100);
         setOnAction(e -> {
-            if (SecondaryController.jug1.isTurno()) {
-                manejarClic();
-                SecondaryController.maquin.setTurno(true);
-                SecondaryController.jug1.setTurno(false);
-                SecondaryController.hayGanador();
-                SecondaryController.computadora();
+            if (SecondaryController.modo.equals("solo")) {
+                
+                if (SecondaryController.jug1.isTurno()) {
+                    manejarClic();
+                    SecondaryController.maquin.setTurno(true);
+                    SecondaryController.jug1.setTurno(false);
+                    System.out.println(SecondaryController.hayGanador());
+                    SecondaryController.computadora();
+                }
+                
+            } else if (SecondaryController.modo.equals("coop")) {
+                
+                if (SecondaryController.jug1.isTurno()) {
+                    manejarClic();
+                    SecondaryController.jug2.setTurno(true);
+                    SecondaryController.jug1.setTurno(false);
+                    System.out.println(SecondaryController.hayGanador());
+                } else {
+                    manejarClic();
+                    SecondaryController.jug2.setTurno(false);
+                    SecondaryController.jug1.setTurno(true);        
+                    System.out.println(SecondaryController.hayGanador());
+                }
+                
+            } else {
             }
+            
+
         });        
     }
     

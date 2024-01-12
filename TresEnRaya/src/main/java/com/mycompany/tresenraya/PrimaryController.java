@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -111,13 +112,14 @@ public class PrimaryController {
             SecondaryController.maquin.setItem("file:imagenes\\x.png");
         }        
     }
-    public static void seleccionSignosPersonas (Boolean isSelected) {
-        if (isSelected) {
-            SecondaryController.jug1.setItem("file:imagenes\\x.png");
-            SecondaryController.jug2.setItem("file:imagenes\\c.png");
-        } else {
-            SecondaryController.jug1.setItem("file:imagenes\\c.png");
-            SecondaryController.jug2.setItem("file:imagenes\\x.png");
+    
+    public static void seleccionSignosPersonas (String seleccion) {
+        if (seleccion.equals("X")) {
+            SecondaryController.jug1 = new Jugador("file:imagenes\\x.png","Jugador 1", false);
+            SecondaryController.jug2 = new Jugador("file:imagenes\\c.png","Jugador 2", false);            
+        } else {            
+            SecondaryController.jug1 = new Jugador("file:imagenes\\c.png","Jugador 1", false);
+            SecondaryController.jug2 = new Jugador("file:imagenes\\x.png","Jugador 2", false);                        
         }        
     }
         
@@ -137,20 +139,25 @@ public class PrimaryController {
         VBox oBox = new VBox();
         xBox.setAlignment(Pos.CENTER);
         oBox.setAlignment(Pos.CENTER);
-        CheckBox x = new CheckBox();
-        CheckBox o = new CheckBox();
-        xBox.getChildren().addAll(new Label("X"), x);
-        oBox.getChildren().addAll(new Label("O"), o);
+        //
+        ComboBox<String> j1 = new ComboBox();
+        j1.getItems().add("X");
+        j1.getItems().add("O");
+        //ComboBox o = new ComboBox();
+        xBox.getChildren().addAll( j1);
+        //oBox.getChildren().addAll(new Label("O"), o);
         
         Label text2 = new Label("Jugador 2:");
         VBox xBox2 = new VBox();
         VBox oBox2 = new VBox();
         xBox2.setAlignment(Pos.CENTER);
         oBox2.setAlignment(Pos.CENTER);
-        CheckBox x2 = new CheckBox();
-        CheckBox o2 = new CheckBox();
-        xBox2.getChildren().addAll(new Label("X"), x2);
-        oBox2.getChildren().addAll(new Label("O"), o2);
+        ComboBox j2 = new ComboBox();
+        j2.getItems().add("X");
+        j2.getItems().add("O");        
+        //CheckBox o2 = new CheckBox();
+        xBox2.getChildren().addAll(j2);
+        //oBox2.getChildren().addAll(new Label("O"), o2);
         
         Label text3 = new Label("¿Cuál signo quiere jugar primero?: ");
         
@@ -164,10 +171,11 @@ public class PrimaryController {
         oBox3.getChildren().addAll(new Label("O"), o3);
         
         p1.getChildren().add(text0);
-        jugador1.getChildren().addAll(text1,xBox, oBox);
+        jugador1.getChildren().addAll(text1,xBox);
+        //jugador1.getChildren().addAll(text1,xBox, oBox);
         jugador1.setSpacing(10);
         
-        jugador2.getChildren().addAll(text2, xBox2, oBox2);
+        jugador2.getChildren().addAll(text2, xBox2);
         jugador2.setSpacing(10);
         p2.getChildren().add(text3);
         signo.getChildren().addAll(xBox3, oBox3);
@@ -184,20 +192,31 @@ public class PrimaryController {
         boxPrincipal.setAlignment(Pos.CENTER);
         
         aceptar.setOnAction(eh -> {
-            if ((x.isSelected() && o.isSelected()) || (x2.isSelected() && o2.isSelected())) {
+            
+            if (/*(x.isSelected() && o.isSelected()) || (x2.isSelected() && o2.isSelected())*/ false) {
                 this.alertaEntrada(2);
-            } else if ((!x.isSelected() && !o.isSelected()) || (!x2.isSelected() && !o2.isSelected())) {
+            } else if (/*(!x.isSelected() && !o.isSelected()) || (!x2.isSelected() && !o2.isSelected())*/ false) {
                 this.alertaEntrada(0);
             } else {
                 try {
                     if (x3.isSelected()) {
-                        SecondaryController.jug1 = new Jugador("Jugador 1", true);
-                        SecondaryController.jug2 = new Jugador("Jugador 2", false);
-                        seleccionSignosPersonas(x3.isSelected());
+                        seleccionSignosPersonas(j1.getValue());
+                        if (SecondaryController.jug1.getItem().equals("file:imagenes\\x.png")) {
+                            SecondaryController.jug1.setTurno(true);
+                            SecondaryController.jug2.setTurno(false);                            
+                        } else {
+                            SecondaryController.jug1.setTurno(false);
+                            SecondaryController.jug2.setTurno(true);                            
+                        }                        
                     } else if(o3.isSelected()){
-                        SecondaryController.jug1 = new Jugador("Jugador 1", false);
-                        SecondaryController.jug2 = new Jugador("Jugador 2", true);
-                        seleccionSignosPersonas(x3.isSelected());
+                        seleccionSignosPersonas(j1.getValue());
+                        if (SecondaryController.jug1.getItem().equals("file:imagenes\\c.png")) {                        
+                            SecondaryController.jug1.setTurno(true);
+                            SecondaryController.jug2.setTurno(false);                            
+                        } else {
+                            SecondaryController.jug1.setTurno(false);
+                            SecondaryController.jug2.setTurno(true);
+                        }                        
                     }
                     App.setRoot("secondary");
                 } catch (IOException ex) {

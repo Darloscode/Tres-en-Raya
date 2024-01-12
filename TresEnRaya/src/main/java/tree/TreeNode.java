@@ -20,6 +20,11 @@ public class TreeNode<E> {
         this.content = content;
         this.children = new LinkedList<Tree<E>>();
     }
+    
+    public TreeNode() {
+        this.content = null;
+        this.children = new LinkedList<Tree<E>>();
+    }    
 
     public E getContent() {
         return content;

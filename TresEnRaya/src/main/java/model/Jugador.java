@@ -23,7 +23,7 @@ public class Jugador {
         this.item = null;
         this.nombre = nombre;
         this.turno = turno;
-    }    
+    }        
         
     public String getItem() {
         return item;
