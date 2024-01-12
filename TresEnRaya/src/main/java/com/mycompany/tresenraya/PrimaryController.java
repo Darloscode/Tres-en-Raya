@@ -8,13 +8,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.Jugador;
 
+/**
+ *
+ * @author Alvarez Orellana Moises
+ * @author Flores González Carlos
+ * @author Maldonado Jaramillo Paulette
+ */
 public class PrimaryController {
     @FXML
     private Button jugarSolo;
@@ -69,7 +72,7 @@ public class PrimaryController {
         CheckBox circulo = new CheckBox();
         
         xBox.getChildren().addAll(new Label("X"), x);
-        circuloBox.getChildren().addAll(new Label("Circulo"), circulo);
+        circuloBox.getChildren().addAll(new Label("O"), circulo);
         
         jugador.getChildren().addAll(label1, check1);
         jugador.setSpacing(10);
@@ -78,13 +81,18 @@ public class PrimaryController {
         jugador.setAlignment(Pos.CENTER);
         signo.setAlignment(Pos.CENTER);
         Button aceptar = new Button("Aceptar");
+        
         boxPrincipal.getChildren().addAll(jugador, signo, aceptar);
         boxPrincipal.setAlignment(Pos.CENTER);
         
         aceptar.setOnAction(eh -> {           
             if (x.isSelected() && circulo.isSelected()) {
-                this.alerta();
-            } else {                
+                this.alerta("Solo debe seleccionar un signo");
+            } else if (!x.isSelected() && !circulo.isSelected()) {
+                this.alerta("Debe seleccionar con que signo quiere jugar");
+            } else if (!check1.isSelected()) {
+                this.alerta("Debe seleccionar si usted quiere jugar primero");
+            } else {
                 try {                    
                     if (check1.isSelected()) {
                         SecondaryController.jug1 = new Jugador("Jugador", true);
@@ -102,26 +110,6 @@ public class PrimaryController {
             }
         });        
     }
-
-    public void seleccionSignos (Boolean isSelected) {
-        if (isSelected) {
-            SecondaryController.jug1.setItem("file:imagenes\\x.png");
-            SecondaryController.maquin.setItem("file:imagenes\\c.png");
-        } else {
-            SecondaryController.jug1.setItem("file:imagenes\\c.png");
-            SecondaryController.maquin.setItem("file:imagenes\\x.png");
-        }        
-    }
-    
-    public static void seleccionSignosPersonas (String seleccion) {
-        if (seleccion.equals("X")) {
-            SecondaryController.jug1 = new Jugador("file:imagenes\\x.png","Jugador 1", false);
-            SecondaryController.jug2 = new Jugador("file:imagenes\\c.png","Jugador 2", false);            
-        } else {            
-            SecondaryController.jug1 = new Jugador("file:imagenes\\c.png","Jugador 1", false);
-            SecondaryController.jug2 = new Jugador("file:imagenes\\x.png","Jugador 2", false);                        
-        }        
-    }
         
     public void opcionesCoop() {
         boxPrincipal.getChildren().clear();
@@ -132,35 +120,25 @@ public class PrimaryController {
         HBox p2 = new HBox();
         HBox signo = new HBox();
         
-        Label text0 = new Label("Escoja la ficha con la que desee jugar");
+        Label text0 = new Label("Escoja la ficha con la que desean jugar");
         
         Label text1 = new Label("Jugador 1:");
-        VBox xBox = new VBox();
-        VBox oBox = new VBox();
-        xBox.setAlignment(Pos.CENTER);
-        oBox.setAlignment(Pos.CENTER);
-        //
+        VBox xBox = new VBox();        
+        xBox.setAlignment(Pos.CENTER);                
         ComboBox<String> j1 = new ComboBox();
         j1.getItems().add("X");
-        j1.getItems().add("O");
-        //ComboBox o = new ComboBox();
-        xBox.getChildren().addAll( j1);
-        //oBox.getChildren().addAll(new Label("O"), o);
+        j1.getItems().add("O");        
+        xBox.getChildren().addAll( j1);        
         
         Label text2 = new Label("Jugador 2:");
-        VBox xBox2 = new VBox();
-        VBox oBox2 = new VBox();
-        xBox2.setAlignment(Pos.CENTER);
-        oBox2.setAlignment(Pos.CENTER);
+        VBox xBox2 = new VBox();        
+        xBox2.setAlignment(Pos.CENTER);        
         ComboBox j2 = new ComboBox();
         j2.getItems().add("X");
-        j2.getItems().add("O");        
-        //CheckBox o2 = new CheckBox();
-        xBox2.getChildren().addAll(j2);
-        //oBox2.getChildren().addAll(new Label("O"), o2);
+        j2.getItems().add("O");                
+        xBox2.getChildren().addAll(j2);        
         
-        Label text3 = new Label("¿Cuál signo quiere jugar primero?: ");
-        
+        Label text3 = new Label("¿Cuál signo quiere jugar primero?: ");        
         VBox xBox3 = new VBox();
         VBox oBox3 = new VBox();
         xBox3.setAlignment(Pos.CENTER);
@@ -171,12 +149,13 @@ public class PrimaryController {
         oBox3.getChildren().addAll(new Label("O"), o3);
         
         p1.getChildren().add(text0);
-        jugador1.getChildren().addAll(text1,xBox);
-        //jugador1.getChildren().addAll(text1,xBox, oBox);
+        
+        jugador1.getChildren().addAll(text1,xBox);        
         jugador1.setSpacing(10);
         
         jugador2.getChildren().addAll(text2, xBox2);
         jugador2.setSpacing(10);
+        
         p2.getChildren().add(text3);
         signo.getChildren().addAll(xBox3, oBox3);
         signo.setSpacing(20);
@@ -188,15 +167,20 @@ public class PrimaryController {
         signo.setAlignment(Pos.CENTER);
         
         Button aceptar = new Button("Aceptar");
-        boxPrincipal.getChildren().addAll(p1,jugador1, jugador2,p2,signo, aceptar);
+        boxPrincipal.getChildren().addAll(p1,jugador1, jugador2,p2,signo, aceptar);       
         boxPrincipal.setAlignment(Pos.CENTER);
         
-        aceptar.setOnAction(eh -> {
-            
-            if (/*(x.isSelected() && o.isSelected()) || (x2.isSelected() && o2.isSelected())*/ false) {
-                this.alertaEntrada(2);
-            } else if (/*(!x.isSelected() && !o.isSelected()) || (!x2.isSelected() && !o2.isSelected())*/ false) {
-                this.alertaEntrada(0);
+        aceptar.setOnAction(eh -> {            
+            if (j1.getValue() == null) {
+                this.alerta("Debe seleccionar un signo para el Jugador 1");
+            } else if (j2.getValue() == null) {
+                this.alerta("Debe seleccionar un signo para el Jugador 2");
+            } else if (j1.getValue().equals(j2.getValue())) {
+                this.alerta("Debe seleccionar signos diferentes para cada jugador");
+            } else if (x3.isSelected() && o3.isSelected()) {
+                this.alerta("Debe seleccionar solo un signo para que jugue primero");
+            } else if (!x3.isSelected() && !o3.isSelected()) {
+                this.alerta("Debe seleccionar un signo para que juegue primero");
             } else {
                 try {
                     if (x3.isSelected()) {
@@ -226,26 +210,31 @@ public class PrimaryController {
         });        
     }
     
-    private void alerta() {
+    public void seleccionSignos (Boolean isSelected) {
+        if (isSelected) {
+            SecondaryController.jug1.setItem("file:imagenes\\x.png");
+            SecondaryController.maquin.setItem("file:imagenes\\c.png");
+        } else {
+            SecondaryController.jug1.setItem("file:imagenes\\c.png");
+            SecondaryController.maquin.setItem("file:imagenes\\x.png");
+        }        
+    }
+    
+    public static void seleccionSignosPersonas (String seleccion) {
+        if (seleccion.equals("X")) {
+            SecondaryController.jug1 = new Jugador("file:imagenes\\x.png","Jugador 1", false);
+            SecondaryController.jug2 = new Jugador("file:imagenes\\c.png","Jugador 2", false);            
+        } else {            
+            SecondaryController.jug1 = new Jugador("file:imagenes\\c.png","Jugador 1", false);
+            SecondaryController.jug2 = new Jugador("file:imagenes\\x.png","Jugador 2", false);                        
+        }        
+    }
+    
+    private void alerta(String mensaje) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle("Advertencia!!");
-        alert.setHeaderText(null);
-        alert.setContentText("Solo debe seleccionar un signo");
+        alert.setHeaderText(null);        
+        alert.setContentText(mensaje);
         alert.showAndWait();
-    }    
-    
-    private void alertaEntrada(int n) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Advertencia!");
-        alert.setHeaderText(null);
-        if(n==2){
-            alert.setContentText("Solo debe seleccionar un signo por participante");
-        }else if(n==0){
-            alert.setContentText("Seleecione al menos un signo por participante");
-        }
-        alert.showAndWait();
-    }    
-    
-    
-    
+    }
 }

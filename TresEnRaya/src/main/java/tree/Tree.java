@@ -6,10 +6,11 @@ package tree;
 
 /**
  *
- * @author ander
+ * @author Alvarez Orellana Moises
+ * @author Flores González Carlos
+ * @author Maldonado Jaramillo Paulette
  */
-public class Tree<E> {
-    
+public class Tree<E> {    
     private TreeNode<E> root;
     
     public Tree () {

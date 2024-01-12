@@ -5,25 +5,32 @@
 package model;
 
 import com.mycompany.tresenraya.SecondaryController;
-import java.util.EventListener;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+
 /**
  *
- * @author ander
+ * @author Alvarez Orellana Moises
+ * @author Flores González Carlos
+ * @author Maldonado Jaramillo Paulette
  */
-public class Cell extends Button{       
-    
+public class Cell extends Button{
     private String signo;
     private int fila;
     private int columna;    
     
+    public Cell(String signo) {
+        this.signo = signo;
+        this.fila = -1;
+        this.columna = -1;
+    }
+    
     public Cell(int fila, int columna) {
         this.signo = null;
         this.fila = fila;
-        this.columna = columna;        
+        this.columna = columna;
         setMinSize(100, 100);
         setOnAction(e -> {
             if (SecondaryController.modo.equals("solo")) {
@@ -46,21 +53,14 @@ public class Cell extends Button{
                 } else {
                     manejarClic();
                     SecondaryController.jug2.setTurno(false);
-                    SecondaryController.jug1.setTurno(true);        
+                    SecondaryController.jug1.setTurno(true);
                     SecondaryController.hayGanador();
                 }
                 
-            } else {
+            } else if (SecondaryController.modo.equals("auto")) {
+                
             }
-            
-
-        });        
-    }
-    
-    public Cell(String signo) {
-        this.signo = signo;
-        this.fila = -1;
-        this.columna = -1;
+        });
     }
 
     public String getSigno() {
@@ -71,14 +71,14 @@ public class Cell extends Button{
         this.signo = signo;
     }
     
-    public void manejarClic() {    
-        if (this.signo == null) {                        
-            Image imagen = new Image(SecondaryController.jugada());        
+    public void manejarClic() {
+        if (this.signo == null) {
+            Image imagen = new Image(SecondaryController.jugada());
             ImageView imageView = new ImageView(imagen);
             imageView.setFitWidth(90);
-            imageView.setFitHeight(90);        
+            imageView.setFitHeight(90);
             this.setGraphic(imageView);
-            this.setSigno(SecondaryController.jugada());            
+            this.setSigno(SecondaryController.jugada());
         }
     }
     
@@ -89,5 +89,5 @@ public class Cell extends Button{
                 ", fila=" + fila +
                 ", columna=" + columna +
                 '}';
-    }       
+    }
 }

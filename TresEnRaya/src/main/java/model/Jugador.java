@@ -6,7 +6,9 @@ package model;
 
 /**
  *
- * @author ander
+ * @author Alvarez Orellana Moises
+ * @author Flores González Carlos
+ * @author Maldonado Jaramillo Paulette
  */
 public class Jugador {
     private String item;
@@ -23,7 +25,7 @@ public class Jugador {
         this.item = null;
         this.nombre = nombre;
         this.turno = turno;
-    }        
+    }
         
     public String getItem() {
         return item;

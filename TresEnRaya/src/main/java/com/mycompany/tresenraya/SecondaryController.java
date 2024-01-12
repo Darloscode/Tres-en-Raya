@@ -3,26 +3,25 @@ package com.mycompany.tresenraya;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import model.Cell;
 import model.Jugador;
 import tree.Tree;
 import tree.TreeNode;
 
+/**
+ *
+ * @author Alvarez Orellana Moises
+ * @author Flores González Carlos
+ * @author Maldonado Jaramillo Paulette
+ */
 public class SecondaryController implements Initializable{
     @FXML
     private Label titulo;    
@@ -37,24 +36,7 @@ public class SecondaryController implements Initializable{
     public static String modo;
     
     public static Cell[][] celdas = new Cell[3][3];    
-        
-    public static String jugada() {
-        if (modo.equals("solo")) {        
-            if (jug1.isTurno()) {
-                return jug1.getItem();
-            } else {
-                return maquin.getItem();
-            }        
-        } else if (modo.equals("coop")) {
-            if (jug1.isTurno()) {
-                return jug1.getItem();
-            } else {
-                return jug2.getItem();
-            }                         
-        }
-        return "";        
-    }
-    
+            
     @FXML
     private void salir() throws IOException {
         App.setRoot("primary");
@@ -72,16 +54,36 @@ public class SecondaryController implements Initializable{
                 tablero.add(celdas[i][j], j, i);
             }        
         }
+        
         if (modo.equals("solo")) {
             SecondaryController.computadora();
         } else if (modo.equals("coop")) {
             System.out.println(jug1);
             System.out.println(jug2);            
         } else if (modo.equals("auto")) {
-            //Código para que la computadora juegue contra si misma
+            //
         }
     }    
-        
+
+    public static String jugada() {
+        if (modo.equals("solo")) {        
+            if (jug1.isTurno()) {
+                return jug1.getItem();
+            } else {
+                return maquin.getItem();
+            }        
+        } else if (modo.equals("coop")) {
+            if (jug1.isTurno()) {
+                return jug1.getItem();
+            } else {
+                return jug2.getItem();
+            }                         
+        } else if (modo.equals("auto")) {
+            //
+        }
+        return "";
+    }
+    
     public static void computadora() {              
         if (maquin.isTurno()){
             Cell[][] jugada = SecondaryController.minimax();
@@ -123,20 +125,22 @@ public class SecondaryController implements Initializable{
                     lista1.add(subArbol);                                                            
                 }
             }
-        }        
-        arbol.getRootNode().setChildren(lista1);        
+        }
+        
+        arbol.getRootNode().setChildren(lista1);
         
         int mejorValor = Integer.MIN_VALUE;
         Tree<Cell[][]> mejorJugada = null;
         
-        List<Tree<Cell[][]>> nodosHijos = arbol.getRootNode().getChildren();        
+        List<Tree<Cell[][]>> nodosHijos = arbol.getRootNode().getChildren();
         
-        for (Tree<Cell[][]> hijo : nodosHijos) {
+        for (Tree<Cell[][]> hijo : nodosHijos) {            
             if (evaluarTablero(hijo.getRoot())==1) {
                 mejorJugada = hijo; 
                 break;
             }
-            int valor = 0;            
+            
+            int valor = 0;
             
             int peorValor = Integer.MAX_VALUE;
             List<Tree<Cell[][]>> nodos3 = hijo.getRootNode().getChildren();
@@ -148,7 +152,8 @@ public class SecondaryController implements Initializable{
                     peorValor = valor2;
                     valor = valor2;
                 }
-            }            
+            }
+            
             if (valor > mejorValor) {
                 mejorValor = valor;
                 mejorJugada = hijo;                
@@ -168,7 +173,7 @@ public class SecondaryController implements Initializable{
                     }                    
                 }
             }
-        }        
+        }
         return coordenadas;
     }
     
@@ -184,13 +189,11 @@ public class SecondaryController implements Initializable{
         for (int i=0; i<3; i++) {
             int countF = 0;
             int countC = 0;
-            
-            
+                        
             for (int j=0; j<3; j++) {                
                 if (matriz[i][j].getSigno() == null || matriz[i][j].getSigno().equals(item)) {
                     countF++;
-                }
-                
+                }                
                 if (matriz[j][i].getSigno() == null || matriz[j][i].getSigno().equals(item)) {
                     countC++;
                 }          
@@ -223,24 +226,23 @@ public class SecondaryController implements Initializable{
         return countFilas+countColumnas+countDiagonales;
     }         
     
-    private static void printNodesAtLevel(TreeNode<Cell[][]> node, int targetLevel, int currentLevel) {
+    private static void printNivel(TreeNode<Cell[][]> node, int targetLevel, int currentLevel) {
         if (node == null) {
             return;
         }
 
         if (currentLevel == targetLevel) {
             System.out.println("*******************************");
-            imprimirMatriz(node.getContent());           
-            System.out.println("*******************************");
+            imprimirMatriz(node.getContent());
         } else {
             for (Tree<Cell[][]> childTree : node.getChildren()) {
-                printNodesAtLevel(childTree.getRootNode(), targetLevel, currentLevel + 1);
+                printNivel(childTree.getRootNode(), targetLevel, currentLevel + 1);
             }
         }
-    }    
+    }
     
     public static Cell[][] copy(Cell[][] matriz) {        
-        Cell[][] copia = new Cell[3][3];        
+        Cell[][] copia = new Cell[3][3];
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 Cell a = new Cell (matriz[i][j].getSigno());
@@ -248,7 +250,7 @@ public class SecondaryController implements Initializable{
             }
         }
         return copia;
-    }    
+    }
     
     public static void imprimirMatriz(Cell[][] matriz) {
         if (matriz!=null){
@@ -263,7 +265,6 @@ public class SecondaryController implements Initializable{
                             System.out.print("OOO" + "\t");
                         }
                     }
-
                 }
                 System.out.println();
             }
@@ -272,17 +273,16 @@ public class SecondaryController implements Initializable{
     
     public static boolean tableroCompleto() {        
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {                
+            for (int j = 0; j < 3; j++) {
                 if (celdas[i][j].getSigno() == null) {
                     return false;
                 }
             }
         }
         return true;
-    }         
+    }
 
     public static int evaluarTablero(Cell[][] tablero) {
-
         String ganador = "";
         
         if (tableroCompleto()){
@@ -294,8 +294,8 @@ public class SecondaryController implements Initializable{
             if (tablero[i][0].getSigno() != null &&
                 tablero[i][0].getSigno().equals(tablero[i][1].getSigno()) &&
                 tablero[i][1].getSigno().equals(tablero[i][2].getSigno())) {
-                ganador = tablero[i][0].getSigno();                
-            }         
+                ganador = tablero[i][0].getSigno();
+            }
         }
 
         // Verificar columnas
@@ -312,17 +312,17 @@ public class SecondaryController implements Initializable{
             tablero[0][0].getSigno().equals(tablero[1][1].getSigno()) &&
             tablero[1][1].getSigno().equals(tablero[2][2].getSigno())) {
             ganador = tablero[0][0].getSigno();
-        }      
+        }
 
         if (tablero[0][2].getSigno() != null &&
             tablero[0][2].getSigno().equals(tablero[1][1].getSigno()) &&
             tablero[1][1].getSigno().equals(tablero[2][0].getSigno())) {
             ganador = tablero[0][2].getSigno();
-        }                 
+        }
         
         if (ganador.equals("Empate")){
             return 0;
-        } else {                        
+        } else {
             if (ganador.equals(jug1.getItem())) {
                 return -1;
             } else if (ganador.equals(maquin.getItem())){
@@ -346,7 +346,7 @@ public class SecondaryController implements Initializable{
                 celdas[i][0].getSigno().equals(celdas[i][1].getSigno()) &&
                 celdas[i][1].getSigno().equals(celdas[i][2].getSigno())) {
                 ganador = celdas[i][0].getSigno();                
-            }         
+            }
         }
 
         // Verificar columnas
@@ -363,13 +363,13 @@ public class SecondaryController implements Initializable{
             celdas[0][0].getSigno().equals(celdas[1][1].getSigno()) &&
             celdas[1][1].getSigno().equals(celdas[2][2].getSigno())) {
             ganador = celdas[0][0].getSigno();
-        }      
+        }
 
         if (celdas[0][2].getSigno() != null &&
             celdas[0][2].getSigno().equals(celdas[1][1].getSigno()) &&
             celdas[1][1].getSigno().equals(celdas[2][0].getSigno())) {
             ganador = celdas[0][2].getSigno();
-        }                 
+        }
         
         if (ganador.equals("Empate")){
             SecondaryController.alerta("Es un empate!!");
@@ -377,28 +377,27 @@ public class SecondaryController implements Initializable{
             
             if (modo.equals("solo")) {
                 jug1.setTurno(false);
-                maquin.setTurno(false);                
+                maquin.setTurno(false);
             } else if (modo.equals("coop")) {
                 jug1.setTurno(false);
                 jug2.setTurno(false);
-            } else {
+            } else if (modo.equals("auto")){
                 
-            }            
+            }
+            
             try {
                 App.setRoot("primary");
                 return false;
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-        } else {
-            
+        } else {            
             if (modo.equals("solo")) {
-
                 if (ganador.equals(jug1.getItem())) {
-                    SecondaryController.alerta("Ha ganado "+jug1.getNombre());                             
-                    SecondaryController.alerta("Juego terminado");   
+                    SecondaryController.alerta("Ha ganado "+jug1.getNombre());
+                    SecondaryController.alerta("Juego terminado");
                     jug1.setTurno(false);
-                    maquin.setTurno(false);                
+                    maquin.setTurno(false);
                     try {
                         App.setRoot("primary");
                         return true;
@@ -410,21 +409,19 @@ public class SecondaryController implements Initializable{
                     SecondaryController.alerta("Juego terminado");
                     jug1.setTurno(false);
                     maquin.setTurno(false);
-                    try {                        
+                    try {
                         App.setRoot("primary");
                         return true;
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
                 }
-                
             } else if (modo.equals("coop")) {
-                
                 if (ganador.equals(jug1.getItem())) {
-                    SecondaryController.alerta("Ha ganado "+jug1.getNombre());                             
-                    SecondaryController.alerta("Juego terminado");   
+                    SecondaryController.alerta("Ha ganado "+jug1.getNombre());
+                    SecondaryController.alerta("Juego terminado");
                     jug1.setTurno(false);
-                    jug2.setTurno(false);                
+                    jug2.setTurno(false);
                     try {
                         App.setRoot("primary");
                         return true;
@@ -435,7 +432,7 @@ public class SecondaryController implements Initializable{
                     SecondaryController.alerta("Ha ganado "+jug2.getNombre());
                     SecondaryController.alerta("Juego terminado");
                     jug1.setTurno(false);
-                    jug2.setTurno(false);                
+                    jug2.setTurno(false);
                     try {
                         App.setRoot("primary");
                         return true;
@@ -443,11 +440,10 @@ public class SecondaryController implements Initializable{
                         ex.printStackTrace();
                     }
                 }                
+            } else if (modo.equals("auto")) {
                 
-            } else {
-                
-            }                       
-        }        
+            }
+        }
         return false;
     }
         
@@ -457,5 +453,5 @@ public class SecondaryController implements Initializable{
         alert.setHeaderText(null);
         alert.setContentText(mensaje);
         alert.showAndWait();        
-    }    
+    }
 }
