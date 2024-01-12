@@ -82,30 +82,18 @@ public class SecondaryController implements Initializable{
         }
     }    
         
-    public static void computadora() {
-        System.out.println("------------------------------------------------------------------");        
+    public static void computadora() {              
         if (maquin.isTurno()){
-            SecondaryController.minimax();
-            boolean salida = true;
-            while (salida) {
-                Random r = new Random();
-
-                int fila = r.nextInt((2-0+1)+0);                
-
-                int columna = r.nextInt((2-0+1)+0);                
-
-                if (celdas[fila][columna].getSigno() == null) {
-                    celdas[fila][columna].manejarClic();
-                    jug1.setTurno(true);
-                    maquin.setTurno(false);
-                    System.out.println(SecondaryController.hayGanador());
-                    salida = false;
-                }            
-            }
+            Cell[][] jugada = SecondaryController.minimax();
+            int[] coordenadas = obtenerCoordenadas(celdas,jugada);
+            celdas[coordenadas[0]][coordenadas[1]].manejarClic();
+            jug1.setTurno(true);
+            maquin.setTurno(false);
+            SecondaryController.hayGanador();
         }
     }
     
-    public static void minimax() {        
+    public static Cell[][] minimax() {        
         Tree<Cell[][]> arbol = new Tree<>(SecondaryController.copy(celdas));                
         
         List<Tree<Cell[][]>> lista1 = new ArrayList<Tree<Cell[][]>>();
@@ -136,89 +124,104 @@ public class SecondaryController implements Initializable{
                 }
             }
         }        
-        arbol.getRootNode().setChildren(lista1);
-        //printNodesAtLevel(arbol.getRootNode(), 2, 1);
-
+        arbol.getRootNode().setChildren(lista1);        
+        
         int mejorValor = Integer.MIN_VALUE;
         Tree<Cell[][]> mejorJugada = null;
         
-        List<Tree<Cell[][]>> nodosHijos = arbol.getRootNode().getChildren();
+        List<Tree<Cell[][]>> nodosHijos = arbol.getRootNode().getChildren();        
         
-        for (Tree<Cell[][]> hijo : nodosHijos) {            
-            int valor = utilidadHojas(hijo, false);                                    
+        for (Tree<Cell[][]> hijo : nodosHijos) {
+            if (evaluarTablero(hijo.getRoot())==1) {
+                mejorJugada = hijo; 
+                break;
+            }
+            int valor = 0;            
+            
+            int peorValor = Integer.MAX_VALUE;
+            List<Tree<Cell[][]>> nodos3 = hijo.getRootNode().getChildren();
+                        
+            for (Tree<Cell[][]> subHijo : nodos3) {
+                int valor2 = utilidadMínima(subHijo.getRoot());
+                
+                if (valor2 < peorValor) {
+                    peorValor = valor2;
+                    valor = valor2;
+                }
+            }            
             if (valor > mejorValor) {
                 mejorValor = valor;
-                mejorJugada = hijo;
-                System.out.println("HAY");
+                mejorJugada = hijo;                
             }
-        }
-        
-        imprimirMatriz(mejorJugada.getRoot());
-        
+        }                
+        return mejorJugada.getRoot();
     }        
 
-    public static int evaluarTablero(Cell[][] tablero) {
-        // Verificar filas
-        for (int i = 0; i < 3; i++) {
-            if (tablero[i][0].getSigno() != null &&
-                tablero[i][0].getSigno().equals(tablero[i][1].getSigno()) &&
-                tablero[i][0].getSigno().equals(tablero[i][2].getSigno())) {
-                return tablero[i][0].getSigno().equals(maquin.getItem()) ? 1 : -1;
+    public static int[] obtenerCoordenadas(Cell[][] actual, Cell[][] nuevo) {
+        int[] coordenadas = new int[2];        
+        for (int i=0; i<3; i++) {
+            for (int j=0; j<3; j++) {
+                if (nuevo[i][j].getSigno() != null) {
+                    if (actual[i][j].getSigno() == null) {                        
+                        coordenadas[0] = i;
+                        coordenadas[1] = j;                        
+                    }                    
+                }
             }
-        }
-
-        // Verificar columnas
-        for (int j = 0; j < 3; j++) {
-            if (tablero[0][j].getSigno() != null &&
-                tablero[0][j].getSigno().equals(tablero[1][j].getSigno()) &&
-                tablero[0][j].getSigno().equals(tablero[2][j].getSigno())) {
-                return tablero[0][j].getSigno().equals(maquin.getItem()) ? 1 : -1;
-            }
-        }
-
-        // Verificar diagonales
-        if (tablero[0][0].getSigno() != null &&
-            tablero[0][0].getSigno().equals(tablero[1][1].getSigno()) &&
-            tablero[0][0].getSigno().equals(tablero[2][2].getSigno())) {
-            return tablero[0][0].getSigno().equals(maquin.getItem()) ? 1 : -1;
-        }
-
-        if (tablero[0][2].getSigno() != null &&
-            tablero[0][2].getSigno().equals(tablero[1][1].getSigno()) &&
-            tablero[0][2].getSigno().equals(tablero[2][0].getSigno())) {
-            return tablero[0][2].getSigno().equals(maquin.getItem()) ? 1 : -1;
-        }
-
-        // Si no hay ganador, se considera empate
-        return 0;
-    }    
+        }        
+        return coordenadas;
+    }
     
-    public static int utilidadHojas(Tree<Cell[][]> nodo, boolean esMaximizador) {
+    public static int utilidadMínima(Cell[][] matriz) {
+        String item = maquin.getItem();
+        int countFilas = 0;
+        int countColumnas = 0;
+        int countDiagonales = 0;
+        int countDI = 0;
+        int countDD = 0;        
+        int c = 2;
         
-        if (nodo.isLeaf()) {
-            return evaluarTablero(nodo.getRoot());
-        }
-
-        List<Tree<Cell[][]>> hijos = nodo.getRootNode().getChildren();
-        int mejorValor;
-
-        if (esMaximizador) {
-            mejorValor = Integer.MIN_VALUE;
-
-            for (Tree<Cell[][]> hijo : hijos) {
-                int valor = utilidadHojas(hijo, false);
-                mejorValor = Math.max(mejorValor, valor);
+        for (int i=0; i<3; i++) {
+            int countF = 0;
+            int countC = 0;
+            
+            
+            for (int j=0; j<3; j++) {                
+                if (matriz[i][j].getSigno() == null || matriz[i][j].getSigno().equals(item)) {
+                    countF++;
+                }
+                
+                if (matriz[j][i].getSigno() == null || matriz[j][i].getSigno().equals(item)) {
+                    countC++;
+                }          
             }
-        } else {
-            mejorValor = Integer.MAX_VALUE;
-
-            for (Tree<Cell[][]> hijo : hijos) {
-                int valor = utilidadHojas(hijo, true);
-                mejorValor = Math.min(mejorValor, valor);
+            
+            if (countF == 3) {
+                countFilas++;
             }
-        }
-        return mejorValor;
-    }    
+            
+            if (countC == 3) {
+                countColumnas++;
+            }
+            
+            if (matriz[i][i].getSigno() == null || matriz[i][i].getSigno().equals(item)) {                
+                countDI++;
+            }
+            
+            if (matriz[i][c].getSigno() == null || matriz[i][c].getSigno().equals(item)) {                
+                countDD++;
+            }
+            
+            if (countDI == 3) {
+                countDiagonales++;
+            }
+            if (countDD == 3) {
+                countDiagonales++;
+            }
+            c--;
+        }                
+        return countFilas+countColumnas+countDiagonales;
+    }         
     
     private static void printNodesAtLevel(TreeNode<Cell[][]> node, int targetLevel, int currentLevel) {
         if (node == null) {
@@ -278,6 +281,58 @@ public class SecondaryController implements Initializable{
         return true;
     }         
 
+    public static int evaluarTablero(Cell[][] tablero) {
+
+        String ganador = "";
+        
+        if (tableroCompleto()){
+            ganador = "Empate";
+        }
+        
+        // Verificar filas
+        for (int i = 0; i < 3; i++) {
+            if (tablero[i][0].getSigno() != null &&
+                tablero[i][0].getSigno().equals(tablero[i][1].getSigno()) &&
+                tablero[i][1].getSigno().equals(tablero[i][2].getSigno())) {
+                ganador = tablero[i][0].getSigno();                
+            }         
+        }
+
+        // Verificar columnas
+        for (int j = 0; j < 3; j++) {
+            if (tablero[0][j].getSigno() != null &&
+                tablero[0][j].getSigno().equals(tablero[1][j].getSigno()) &&
+                tablero[1][j].getSigno().equals(tablero[2][j].getSigno())) {
+                ganador = tablero[0][j].getSigno();
+            }
+        }
+
+        // Verificar diagonales
+        if (tablero[0][0].getSigno() != null &&
+            tablero[0][0].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[1][1].getSigno().equals(tablero[2][2].getSigno())) {
+            ganador = tablero[0][0].getSigno();
+        }      
+
+        if (tablero[0][2].getSigno() != null &&
+            tablero[0][2].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[1][1].getSigno().equals(tablero[2][0].getSigno())) {
+            ganador = tablero[0][2].getSigno();
+        }                 
+        
+        if (ganador.equals("Empate")){
+            return 0;
+        } else {                        
+            if (ganador.equals(jug1.getItem())) {
+                return -1;
+            } else if (ganador.equals(maquin.getItem())){
+                return 1;
+            } else {
+                return -2;
+            }
+        }
+    }
+    
     public static boolean hayGanador() {
         String ganador = "";
         

@@ -32,7 +32,7 @@ public class Cell extends Button{
                     manejarClic();
                     SecondaryController.maquin.setTurno(true);
                     SecondaryController.jug1.setTurno(false);
-                    System.out.println(SecondaryController.hayGanador());
+                    SecondaryController.hayGanador();
                     SecondaryController.computadora();
                 }
                 
@@ -42,12 +42,12 @@ public class Cell extends Button{
                     manejarClic();
                     SecondaryController.jug2.setTurno(true);
                     SecondaryController.jug1.setTurno(false);
-                    System.out.println(SecondaryController.hayGanador());
+                    SecondaryController.hayGanador();
                 } else {
                     manejarClic();
                     SecondaryController.jug2.setTurno(false);
                     SecondaryController.jug1.setTurno(true);        
-                    System.out.println(SecondaryController.hayGanador());
+                    SecondaryController.hayGanador();
                 }
                 
             } else {
