@@ -11,7 +11,14 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import model.Cell;
 import model.Jugador;
@@ -29,6 +36,8 @@ public class SecondaryController implements Initializable{
     private Label titulo;    
     @FXML
     private VBox boxPrincipal;
+    @FXML
+    private Pane panePrincipal;
     
     GridPane tablero;
     
@@ -61,7 +70,7 @@ public class SecondaryController implements Initializable{
         if (!guardado) {
             tablero = new GridPane();
             tablero.setPrefSize(270, 270);
-            tablero.setStyle("-fx-background-color: white;");                        
+            tablero.setStyle("-fx-background-color: white;");             
             boxPrincipal.getChildren().add(tablero);
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
@@ -123,6 +132,7 @@ public class SecondaryController implements Initializable{
         }
     }
     
+/*    
     public static Cell[][] minimax() {        
         Tree<Cell[][]> arbol = new Tree<>(SecondaryController.copy(celdas));                
         
@@ -161,8 +171,9 @@ public class SecondaryController implements Initializable{
         
         List<Tree<Cell[][]>> nodosHijos = arbol.getRootNode().getChildren();
         
-        for (Tree<Cell[][]> hijo : nodosHijos) {            
-            if (evaluarTablero(hijo.getRoot())==1) {
+        for (Tree<Cell[][]> hijo : nodosHijos) {
+            
+            if (evaluarTablero(hijo.getRoot())==-2) {
                 mejorJugada = hijo; 
                 break;                
             }
@@ -188,6 +199,182 @@ public class SecondaryController implements Initializable{
         }                
         return mejorJugada.getRoot();
     }        
+
+    public static int evaluarTablero(Cell[][] tablero) {
+        String ganador = "";
+        
+        if (tableroCompleto()){
+            ganador = "Empate";
+        }
+        
+        // Verificar filas
+        for (int i = 0; i < 3; i++) {
+            if (tablero[i][0].getSigno() != null &&
+                tablero[i][0].getSigno().equals(tablero[i][1].getSigno()) &&
+                tablero[i][1].getSigno().equals(tablero[i][2].getSigno())) {
+                ganador = tablero[i][0].getSigno();
+            }
+        }
+
+        // Verificar columnas
+        for (int j = 0; j < 3; j++) {
+            if (tablero[0][j].getSigno() != null &&
+                tablero[0][j].getSigno().equals(tablero[1][j].getSigno()) &&
+                tablero[1][j].getSigno().equals(tablero[2][j].getSigno())) {
+                ganador = tablero[0][j].getSigno();
+            }
+        }
+
+        // Verificar diagonales
+        if (tablero[0][0].getSigno() != null &&
+            tablero[0][0].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[1][1].getSigno().equals(tablero[2][2].getSigno())) {
+            ganador = tablero[0][0].getSigno();
+        }
+
+        if (tablero[0][2].getSigno() != null &&
+            tablero[0][2].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[1][1].getSigno().equals(tablero[2][0].getSigno())) {
+            ganador = tablero[0][2].getSigno();
+        }
+
+        if (ganador.equals("Empate")){
+            return 0;
+        } else {
+            if (ganador.equals(jug1.getItem())) {
+                return -2;
+            } else if (ganador.equals(maquin.getItem())){
+                return 1;
+            } else {
+                return 0;
+            }     }   
+    }
+*/
+    
+    
+
+    public static Cell[][] minimax() {        
+        Tree<Cell[][]> arbol = new Tree<>(SecondaryController.copy(celdas));                
+        
+        List<Tree<Cell[][]>> lista1 = new ArrayList<Tree<Cell[][]>>();
+        
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {                
+                if (celdas[i][j].getSigno() == null) {
+                    Cell[][] nuevo = SecondaryController.copy(celdas);
+                    nuevo[i][j].setSigno(maquin.getItem());
+                    
+                    Tree<Cell[][]> subArbol = new Tree<>(SecondaryController.copy(nuevo));
+                                        
+                    List<Tree<Cell[][]>> lista2 = new ArrayList<Tree<Cell[][]>>();
+                    
+                    for (int m=0; m<3; m++) {
+                        for (int n=0; n<3; n++) {
+                            if (nuevo[m][n].getSigno() == null) {
+                                Cell[][] segunda = SecondaryController.copy(nuevo);
+                                segunda[m][n].setSigno(jug1.getItem());
+                                Tree<Cell[][]> sigArbol = new Tree<>(SecondaryController.copy(segunda));
+                                lista2.add(sigArbol);
+                            }
+                        }
+                    } 
+                    subArbol.getRootNode().setChildren(lista2);                    
+                    lista1.add(subArbol);                                                            
+                }
+            }
+        }
+        
+        arbol.getRootNode().setChildren(lista1);
+        
+        int mejorValor = Integer.MIN_VALUE;
+        Tree<Cell[][]> mejorJugada = null;        
+        List<Tree<Cell[][]>> nodosHijos = arbol.getRootNode().getChildren();        
+        List<Integer> minimos = new ArrayList<>();
+        
+        for (Tree<Cell[][]> hijo : nodosHijos) {            
+            if (evaluarTablero(hijo.getRoot())==1) {
+                mejorJugada = hijo;
+                break;                
+            }           
+            
+            int peorValor = Integer.MAX_VALUE;            
+            List<Tree<Cell[][]>> nodos3 = hijo.getRootNode().getChildren();                        
+            for (Tree<Cell[][]> subHijo : nodos3) {
+                if (evaluarTablero(subHijo.getRoot())==-1) {
+                    mejorJugada = subHijo;
+                    break;                
+                }                  
+                
+                int valor2 = utilidadMínima(subHijo.getRoot());
+                
+                if (valor2 < peorValor) {
+                    peorValor = valor2;                    
+                }
+            }
+            
+            if (mejorJugada != null) {
+                break;
+            }
+            
+            minimos.add(peorValor);
+        }
+        
+        if (mejorJugada == null) {
+            int indice = 0;
+            for (int i=0; i<minimos.size(); i++) {
+                if (minimos.get(i) > mejorValor) {
+                    mejorValor = minimos.get(i);
+                    indice = i;
+                }
+            }
+            mejorJugada = nodosHijos.get(indice);
+        }
+        
+        return mejorJugada.getRoot();
+    }        
+
+    public static int evaluarTablero(Cell[][] tablero) {
+        String ganador = "";
+        
+        // Verificar filas
+        for (int i = 0; i < 3; i++) {
+            if (tablero[i][0].getSigno() != null &&
+                tablero[i][0].getSigno().equals(tablero[i][1].getSigno()) &&
+                tablero[i][1].getSigno().equals(tablero[i][2].getSigno())) {
+                ganador = tablero[i][0].getSigno();
+            }
+        }
+
+        // Verificar columnas
+        for (int j = 0; j < 3; j++) {
+            if (tablero[0][j].getSigno() != null &&
+                tablero[0][j].getSigno().equals(tablero[1][j].getSigno()) &&
+                tablero[1][j].getSigno().equals(tablero[2][j].getSigno())) {
+                ganador = tablero[0][j].getSigno();
+            }
+        }
+
+        // Verificar diagonales
+        if (tablero[0][0].getSigno() != null &&
+            tablero[0][0].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[1][1].getSigno().equals(tablero[2][2].getSigno())) {
+            ganador = tablero[0][0].getSigno();
+        }
+
+        if (tablero[0][2].getSigno() != null &&
+            tablero[0][2].getSigno().equals(tablero[1][1].getSigno()) &&
+            tablero[1][1].getSigno().equals(tablero[2][0].getSigno())) {
+            ganador = tablero[0][2].getSigno();
+        }
+        
+        if (ganador.equals(jug1.getItem())) {
+            return -1;
+        } else if (ganador.equals(maquin.getItem())){
+            return 1;
+        } else {
+            return 0;
+        }     
+    }    
 
     public static int[] obtenerCoordenadas(Cell[][] actual, Cell[][] nuevo) {
         int[] coordenadas = new int[2];        
@@ -308,57 +495,6 @@ public class SecondaryController implements Initializable{
         }
         return true;
     }
-
-    public static int evaluarTablero(Cell[][] tablero) {
-        String ganador = "";
-        
-        if (tableroCompleto()){
-            ganador = "Empate";
-        }
-        
-        // Verificar filas
-        for (int i = 0; i < 3; i++) {
-            if (tablero[i][0].getSigno() != null &&
-                tablero[i][0].getSigno().equals(tablero[i][1].getSigno()) &&
-                tablero[i][1].getSigno().equals(tablero[i][2].getSigno())) {
-                ganador = tablero[i][0].getSigno();
-            }
-        }
-
-        // Verificar columnas
-        for (int j = 0; j < 3; j++) {
-            if (tablero[0][j].getSigno() != null &&
-                tablero[0][j].getSigno().equals(tablero[1][j].getSigno()) &&
-                tablero[1][j].getSigno().equals(tablero[2][j].getSigno())) {
-                ganador = tablero[0][j].getSigno();
-            }
-        }
-
-        // Verificar diagonales
-        if (tablero[0][0].getSigno() != null &&
-            tablero[0][0].getSigno().equals(tablero[1][1].getSigno()) &&
-            tablero[1][1].getSigno().equals(tablero[2][2].getSigno())) {
-            ganador = tablero[0][0].getSigno();
-        }
-
-        if (tablero[0][2].getSigno() != null &&
-            tablero[0][2].getSigno().equals(tablero[1][1].getSigno()) &&
-            tablero[1][1].getSigno().equals(tablero[2][0].getSigno())) {
-            ganador = tablero[0][2].getSigno();
-        }
-        
-        if (ganador.equals("Empate")){
-            return 0;
-        } else {
-            if (ganador.equals(jug1.getItem())) {
-                return -1;
-            } else if (ganador.equals(maquin.getItem())){
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-    }        
     
     public static boolean hayGanador() {
         String ganador = "";
