@@ -100,8 +100,7 @@ public class Cell extends Button implements Serializable{
         }
         setOnAction(e -> {
             this.accion();
-        });
-        System.out.println("Terminado");
+        });        
         SecondaryController.hayGanador();
         SecondaryController.computadora();
     }

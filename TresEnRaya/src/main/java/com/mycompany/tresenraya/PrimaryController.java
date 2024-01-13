@@ -125,8 +125,6 @@ public class PrimaryController implements Initializable{
                 this.alerta("Solo debe seleccionar un signo");
             } else if (!x.isSelected() && !circulo.isSelected()) {
                 this.alerta("Debe seleccionar con que signo quiere jugar");
-            } else if (!check1.isSelected()) {
-                this.alerta("Debe seleccionar si usted quiere jugar primero");
             } else {
                 try {                    
                     if (check1.isSelected()) {

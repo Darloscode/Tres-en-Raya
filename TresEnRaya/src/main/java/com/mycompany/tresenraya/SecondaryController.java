@@ -70,16 +70,11 @@ public class SecondaryController implements Initializable{
                 }        
             }
         } else {
-            guardado = false;
-            System.out.println("Jua: "+jug1.getItem());
-            System.out.println(jug1.isTurno());
-            System.out.println("Maq: "+maquin.getItem());
-            System.out.println(maquin.isTurno());
+            guardado = false;            
             tablero = new GridPane();
             tablero.setPrefSize(270, 270);
             tablero.setStyle("-fx-background-color: white;");
-            boxPrincipal.getChildren().add(tablero);
-            imprimirMatriz(celdas);
+            boxPrincipal.getChildren().add(tablero);            
             for (int i = 0; i < 3; i++) {
                 for (int j = 0; j < 3; j++) {
                     celdas[i][j].cargar();
