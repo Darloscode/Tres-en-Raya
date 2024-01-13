@@ -4,13 +4,15 @@
  */
 package model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Alvarez Orellana Moises
  * @author Flores González Carlos
  * @author Maldonado Jaramillo Paulette
  */
-public class Jugador {
+public class Jugador implements Serializable {
     private String item;
     private String nombre;
     private boolean turno;

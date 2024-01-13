@@ -1,7 +1,13 @@
 package com.mycompany.tresenraya;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.URL;
+import java.util.ResourceBundle;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -10,6 +16,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import model.Cell;
 import model.Jugador;
 
 /**
@@ -18,7 +25,7 @@ import model.Jugador;
  * @author Flores González Carlos
  * @author Maldonado Jaramillo Paulette
  */
-public class PrimaryController {
+public class PrimaryController implements Initializable{
     @FXML
     private Button jugarSolo;
     @FXML
@@ -29,6 +36,34 @@ public class PrimaryController {
     private Button salir;
     @FXML
     private VBox boxPrincipal;
+         
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        File archivo = new File ("partidas\\Partida_Guardada.ser");
+        if (archivo.exists()) {
+            Button cargarPartida = new Button("Continuar Partida");
+            cargarPartida.setPrefHeight(30);
+            cargarPartida.setPrefWidth(200);
+            boxPrincipal.getChildren().add(2, cargarPartida);
+            cargarPartida.setOnAction(eh -> {
+                try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("partidas\\Partida_Guardada.ser"))) {
+                    SecondaryController.maquin = (Jugador) ois.readObject();
+                    SecondaryController.jug1 = (Jugador) ois.readObject();
+                    SecondaryController.jug2 = (Jugador) ois.readObject();
+                    SecondaryController.modo = (String) ois.readObject();
+                    SecondaryController.celdas = (Cell[][]) ois.readObject();                    
+                    System.out.println("Objetos deserializados");
+                    SecondaryController.guardado = true;
+                    App.setRoot("secondary");
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                archivo.delete();
+            });
+        } else {
+            System.out.println("El archivo " + archivo + " no existe");
+        }
+    }
     
     @FXML
     private void jugarSolo() throws IOException {
@@ -47,7 +82,7 @@ public class PrimaryController {
     @FXML
     private void autoJuego() throws IOException {
         System.out.println("Espectador de juego");
-    }    
+    }
     
     @FXML
     private void salir() throws IOException {
@@ -103,6 +138,7 @@ public class PrimaryController {
                         SecondaryController.maquin = new Jugador("Maquina", true);                        
                         this.seleccionSignos(x.isSelected());
                     }
+                    SecondaryController.celdas = new Cell[3][3];
                     App.setRoot("secondary");                    
                 } catch (IOException ex) {
                     ex.printStackTrace();

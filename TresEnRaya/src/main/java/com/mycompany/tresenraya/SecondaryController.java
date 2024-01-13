@@ -1,6 +1,8 @@
 package com.mycompany.tresenraya;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,31 +30,62 @@ public class SecondaryController implements Initializable{
     @FXML
     private VBox boxPrincipal;
     
-    GridPane tablero = new GridPane();
+    GridPane tablero;
     
     public static Jugador maquin;
     public static Jugador jug1;
     public static Jugador jug2;
     public static String modo;
     
+    public static boolean guardado;
+    
     public static Cell[][] celdas = new Cell[3][3];    
             
     @FXML
-    private void salir() throws IOException {
+    private void salir() throws IOException {        
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("partidas\\Partida_Guardada.ser"))) {
+            oos.writeObject(maquin);
+            oos.writeObject(jug1);
+            oos.writeObject(jug2);
+            oos.writeObject(modo);
+            oos.writeObject(celdas);             
+            System.out.println("Objetos serializados correctamente.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         App.setRoot("primary");
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        tablero.setPrefSize(270, 270);
-        tablero.setStyle("-fx-background-color: white;");
-        boxPrincipal.getChildren().add(tablero);        
-        
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                celdas[i][j] = new Cell(i, j);
-                tablero.add(celdas[i][j], j, i);
-            }        
+        if (!guardado) {
+            tablero = new GridPane();
+            tablero.setPrefSize(270, 270);
+            tablero.setStyle("-fx-background-color: white;");                        
+            boxPrincipal.getChildren().add(tablero);
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    celdas[i][j] = new Cell(i, j);                    
+                    tablero.add(celdas[i][j], j, i);
+                }        
+            }
+        } else {
+            guardado = false;
+            System.out.println("Jua: "+jug1.getItem());
+            System.out.println(jug1.isTurno());
+            System.out.println("Maq: "+maquin.getItem());
+            System.out.println(maquin.isTurno());
+            tablero = new GridPane();
+            tablero.setPrefSize(270, 270);
+            tablero.setStyle("-fx-background-color: white;");
+            boxPrincipal.getChildren().add(tablero);
+            imprimirMatriz(celdas);
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    celdas[i][j].cargar();
+                    tablero.add(celdas[i][j], j, i);
+                }
+            }            
         }
         
         if (modo.equals("solo")) {
@@ -109,7 +142,6 @@ public class SecondaryController implements Initializable{
                     Tree<Cell[][]> subArbol = new Tree<>(SecondaryController.copy(nuevo));
                                         
                     List<Tree<Cell[][]>> lista2 = new ArrayList<Tree<Cell[][]>>();
-                                        
                     
                     for (int m=0; m<3; m++) {
                         for (int n=0; n<3; n++) {
@@ -137,9 +169,9 @@ public class SecondaryController implements Initializable{
         for (Tree<Cell[][]> hijo : nodosHijos) {            
             if (evaluarTablero(hijo.getRoot())==1) {
                 mejorJugada = hijo; 
-                break;
+                break;                
             }
-            
+
             int valor = 0;
             
             int peorValor = Integer.MAX_VALUE;
@@ -328,10 +360,10 @@ public class SecondaryController implements Initializable{
             } else if (ganador.equals(maquin.getItem())){
                 return 1;
             } else {
-                return -2;
+                return 0;
             }
         }
-    }
+    }        
     
     public static boolean hayGanador() {
         String ganador = "";
