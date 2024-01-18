@@ -46,5 +46,12 @@ public class TreeNode<E> {
 
     public void setChildren(List<Tree<E>> children) {
         this.children = children;
-    }     
+    }   
+    public void addChildren(Tree<E> content){
+        this.children.add(content);
+        
+    }
+    public String toString() {
+        return content.toString();
+    }
 }

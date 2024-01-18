@@ -16,12 +16,23 @@ public class Jugador implements Serializable {
     private String item;
     private String nombre;
     private boolean turno;
+    private boolean modoAuto;
 
     public Jugador(String item, String nombre, boolean turno) {
         this.item = item;
         this.nombre = nombre;
         this.turno = turno;
+        modoAuto = false;
     }
+
+    public boolean isModoAuto() {
+        return modoAuto;
+    }
+
+    public void setModoAuto(boolean modoAuto) {
+        this.modoAuto = modoAuto;
+    }
+    
 
     public Jugador(String nombre, boolean turno) {
         this.item = null;

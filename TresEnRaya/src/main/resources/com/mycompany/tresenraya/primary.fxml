@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="417.0" prefWidth="659.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tresenraya.PrimaryController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="417.0" prefWidth="659.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tresenraya.PrimaryController">
    <children>
       <VBox fx:id="boxPrincipal" alignment="CENTER" prefHeight="417.0" prefWidth="659.0" spacing="20.0">
          <padding>
@@ -27,7 +26,6 @@
             </Label>
             <Button fx:id="jugarSolo" onAction="#jugarSolo" prefHeight="30.0" prefWidth="200.0" text="Jugar Solo" />
             <Button fx:id="juegoCoop" mnemonicParsing="false" onAction="#juegoCoop" prefHeight="30.0" prefWidth="200.0" text="Juego Cooperativo" />
-            <Button fx:id="autoJuego" mnemonicParsing="false" onAction="#autoJuego" prefHeight="30.0" prefWidth="200.0" text="Auto Juego" />
             <Button fx:id="salir" mnemonicParsing="false" onAction="#salir" prefHeight="30.0" prefWidth="200.0" text="Salir" />
          </children>
       </VBox>

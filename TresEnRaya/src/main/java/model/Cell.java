@@ -41,12 +41,15 @@ public class Cell extends Button implements Serializable{
     public void accion() {        
         if (SecondaryController.modo.equals("solo")) {
 
-            if (SecondaryController.jug1.isTurno()) {
+            if (SecondaryController.jug1.isTurno() && signo==null) {
                 manejarClic();
                 SecondaryController.maquin.setTurno(true);
                 SecondaryController.jug1.setTurno(false);
                 SecondaryController.hayGanador();
                 SecondaryController.computadora();
+            }else{
+                
+                System.out.println("Ya existe un valor en esa posicion");
             }
 
         } else if (SecondaryController.modo.equals("coop")) {
@@ -84,6 +87,9 @@ public class Cell extends Button implements Serializable{
             imageView.setFitHeight(90);
             this.setGraphic(imageView);
             this.setSigno(SecondaryController.jugada());
+            
+        }else{
+            System.out.println("Ya hay un valir");
         }
     }
     
